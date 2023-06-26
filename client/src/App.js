@@ -4,8 +4,8 @@ import { useEffect } from 'react';
 
 import {init} from './components/Web3Client'
 
-import Listing from "./components/listing";
-import { Storage } from "./components/Storage";
+import { NFTMint } from "./components/NFTMint";
+import { MarketPlace } from "./components/MarketPlace";
 
 
 function App() {
@@ -15,8 +15,8 @@ function App() {
   return (
     <div className='App'>
       <h1>Hello</h1>
-      {/* <Listing/> */}
-      <Storage/>
+      <NFTMint/>
+      <MarketPlace/>
       </div>
   )
 
