@@ -2,7 +2,7 @@ import React, { memo, useState } from 'react'
 import {mintNFT, getTokenURI, getTokenCounter} from './Web3Client'
 import "../App.css"
 
-function Listing() {
+function ListingPage() {
     const [imageURI, setImageURI] = useState("")
     const [IPFSURI, setIPFSURI] = useState("https://bafkreick4d75t5obnrrah62kynqot3ngpzr273pwa35gyuu337sikljgky.ipfs.nftstorage.link/")
     const [lastToken, setLastToken] = useState()
@@ -96,6 +96,7 @@ function Listing() {
 
   return (
     <div className='main-app'>
+        <h1>DEPRECIATED</h1>
         {/* {mintNftButton()} */}
         {showNFTButton()}
         {hideNFTButton()}
@@ -110,4 +111,4 @@ function Listing() {
   )
 }
 
-export default Listing
+export default ListingPage

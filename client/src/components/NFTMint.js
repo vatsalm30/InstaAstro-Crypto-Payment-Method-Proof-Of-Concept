@@ -6,6 +6,8 @@ import "../App.css";
 export const NFTMint = () => {
 
     const [nftImage, setNFTImage] = useState(new Blob())
+    const [nftName, setNFTName] = useState("Shark")
+    const [nftDescr, setNFTDescr] = useState("Thing")
 
     const NFT_STORAGE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweEYyODM3YUM2MjJDYTk1NTBEQzBmODM0MWE5OGZGNkIzQUYwMWM3ODMiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTY3NTAwOTUzNTI0MywibmFtZSI6IlZhbWF6b24gSXBmcyBlbmNvZGluZyJ9.ry07HwNtVi4ciXthBL9HZgcr1kLaRy7PesrRfLeS0BI"
     async function storeNFT(_image, _name, _description) {
@@ -23,20 +25,13 @@ export const NFTMint = () => {
           description: _description,
         }).then(nftIPFS => {
             MintNFT(nftIPFS.url)
+            console.log(nftIPFS.url)
             return nftIPFS;
           })
         .catch(error => console.error(error));
     }
 
     const MintNFT = (nftURL) => {
-        // mintNFT("https://bafkreick4d75t5obnrrah62kynqot3ngpzr273pwa35gyuu337sikljgky.ipfs.nftstorage.link/").then(tx => {
-        //   console.log(tx)
-        // }).catch(err => {console.log(err)})
-    
-        // mintNFT("https://bafybeihkwifjq7xglttbvgarfyonjfbcug7jl5ivhpfdzjswhsg6dgoj6a.ipfs.nftstorage.link/").then(tx => {
-        //   console.log(tx)
-        // }).catch(err => {console.log(err)})
-    
         mintNFT(nftURL).then(tx => {
           console.log(tx)
         }).catch(err => {console.log(err)})
@@ -44,7 +39,7 @@ export const NFTMint = () => {
 
     async function handelSubmit(e){
         e.preventDefault()
-        const result = await storeNFT(nftImage, "Monkey", "Weird Monkey NFT", resolve => setTimeout(resolve, 3000))
+        const result = await storeNFT(nftImage, nftName, nftDescr, resolve => setTimeout(resolve, 3000))
         console.log(result)
     }
 
@@ -66,12 +61,29 @@ export const NFTMint = () => {
         };
         reader.readAsDataURL(e.target.files[0]);
     }
-
+    const onGetName = (e) => {
+      var reader = new FileReader();
+      reader.onload = function(event) {
+      var imageBlob = dataURItoBlob(event.target.result);
+      setNFTImage(imageBlob)
+      };
+      setNFTName(e.target.value)
+    }
+    const onGetDescr = (e) => {
+      setNFTDescr(e.target.value)
+    }
     return (
     <div>
         <form onSubmit={handelSubmit}>
-        <input type="file" onChange={onGetImage}></input>
-        <input type='Submit' value="Mint" className = "cta-button mint-nft-button"></input>
+        <input type="file" onChange={onGetImage} className='cta-file'/>
+        <br></br>
+        <label for="text" className="cta-label">Name</label>
+        <input type="text" onChange={onGetName} className='cta-text'/>
+        <br></br>
+        <label for="text" className="cta-label">Description</label>
+        <input type="text" onChange={onGetDescr} className='cta-text'/>
+        <br></br>
+        <input type='Submit' value="Mint" className = "cta-button"/>
         </form>
     </div>
     )

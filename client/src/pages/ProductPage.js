@@ -1,6 +1,6 @@
 import React from 'react'
 
-export const productpage = () => {
+export const ProductPage = () => {
   return (
     <div>productpage</div>
   )

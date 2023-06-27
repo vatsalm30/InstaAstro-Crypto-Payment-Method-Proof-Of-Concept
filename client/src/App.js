@@ -4,20 +4,31 @@ import { useEffect } from 'react';
 
 import {init} from './components/Web3Client'
 
-import { NFTMint } from "./components/NFTMint";
-import { MarketPlace } from "./components/MarketPlace";
+import HomePage from "./pages/HomePage";
 
+import { MarketPlacePage } from "./pages/MarketPlacePage";
 
-function App() {
+import ListingPage from "./pages/ListingPage"
 
-  useEffect(()=>{init()}, []);
+import ProfilePage from "./pages/ProfilePage"
+
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+function App() {  
+  useEffect(()=>{
+    init()
+  }, []);
 
   return (
-    <div className='App'>
-      <h1>Hello</h1>
-      <NFTMint/>
-      <MarketPlace/>
-      </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage/>}/>
+        <Route path="/market" element={<MarketPlacePage/>}/>
+        <Route path="/listing" element={<ListingPage/>}/>
+        <Route path="/profile" element={<ProfilePage/>}/>
+        <Route path="/*" element={<HomePage/>}/>
+      </Routes>
+    </BrowserRouter>
   )
 
 }
