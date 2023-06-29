@@ -13,17 +13,6 @@ const ProfilePage = () => {
 
     const navigate = useNavigate();
 
-    useEffect(()=>{
-        try{
-            getTokenCounter().then((tokenID) =>{
-                loopOverTokens(tokenID)
-            }).catch((error) => console.log(error))
-        }
-        catch (err){
-            navigate("/")
-        }
-    }, [])
-
     useEffect(() => {
         if (typeof window.ethereum !== 'undefined') {
           // Request the user's accounts from MetaMask
@@ -31,6 +20,14 @@ const ProfilePage = () => {
           window.ethereum.request({ method: 'eth_accounts' })
             .then(async (result) => {
               setAccount(result[0]);
+              try{
+                getTokenCounter().then((tokenID) =>{
+                    loopOverTokens(tokenID, result[0])
+                }).catch((error) => console.log(error))
+                }
+                catch (err){
+                    navigate("/")
+                }
               const weiBalance = await web3.eth.getBalance(result[0]);
               const ethBalance = web3.utils.fromWei(weiBalance, 'ether');    
               setBalance(ethBalance)
@@ -42,6 +39,15 @@ const ProfilePage = () => {
           console.error('MetaMask is not installed');
         }
       }, []);
+      
+      useEffect(()=>{
+        if(typeof window.ethereum != "undefined"){
+            window.ethereum.on('accountsChanged', function(accounts){
+                navigate("/")
+                navigate("/profile")
+              })
+        }
+      })
 
       function fetchTokenURI(tokenID, done) {
         GetTokenURI(parseInt(tokenID)).then(async CID => {
@@ -58,14 +64,22 @@ const ProfilePage = () => {
         });
     }
 
-    async function loopOverTokens(tokenID){
+    async function loopOverTokens(tokenID, Account){
         for(let i = 1; i<= tokenID; i++){
-            await fetchTokenURI(i, i==tokenID && NFTImageData.length == 0);
+            GetNFTMinter(i).then(async (Owner)=>{
+                if (window.BigInt(Account) == window.BigInt(Owner))            
+                    fetchTokenURI(i, i == tokenID && NFTImageData.length == 0);
+            }
+            )
+
         }
     }
 
     const GetTokenURI = (tokenID) => {
         return getTokenURI(tokenID)
+    }    
+    const GetNFTMinter = (tokenID) => {
+        return getNFTMinter(tokenID)
     }
 
     const ListingRedirect = () => {

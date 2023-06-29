@@ -14,6 +14,11 @@ import ProfilePage from "./pages/ProfilePage"
 
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
+/*
+pyramint.io
+pyrmint.com
+*/
+
 function App() {  
   useEffect(()=>{
     init()

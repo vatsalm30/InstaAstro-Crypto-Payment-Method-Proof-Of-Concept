@@ -41,5 +41,5 @@ export const getTokenCounter = () => {
     return NFT.methods.lastTokenId().call();
   }
 export const getNFTMinter = (tokenID) => {
-    return NFT.methods.getMinterAddress(tokenID).call();
+    return NFT.methods.ownerOf(tokenID).call();
   }

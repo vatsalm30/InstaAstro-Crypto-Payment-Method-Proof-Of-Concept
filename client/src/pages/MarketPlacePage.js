@@ -26,6 +26,7 @@ export const MarketPlacePage = () => {
                 tokensArray.push(json)
                 if(done){
                     setNFTImageData([...NFTImageData, ...tokensArray])
+                    tokensArray=[]
                 }
                 
             })
