@@ -1,5 +1,5 @@
 import {useState, useEffect} from 'react';
-import {getTokenURI, getTokenCounter} from '../components/Web3Client';
+import {getTokenURI, getTokenCounter, init} from '../components/Web3Client';
 import TitlebarImageList from '../components/ImagePanel';
 import { useNavigate } from "react-router-dom";
 
@@ -7,17 +7,36 @@ export const MarketPlacePage = () => {
     const [NFTImageData, setNFTImageData] = useState([]);
     const tokensArray = []
     const navigate = useNavigate();
+    const [loadSite, setLoadSite] = useState(false);
 
     useEffect(()=>{
-        try{
+        if(loadSite){
+            try{
             getTokenCounter().then((tokenID) =>{
                 loopOverTokens(tokenID)
+                if(NFTImageData.length !== 0 && NFTImageData.length < tokenID) navigate("/market")
             }).catch((error) => console.log(error))
+            }
+            catch (err){
+                navigate("/market")
+            }
         }
-        catch (err){
-            navigate("/")
+
+    })
+    useEffect(() => {
+        const onPageLoad = () => {
+          setLoadSite(true);
+        };
+    
+        // Check if the page has already loaded
+        if (document.readyState === 'complete') {
+          onPageLoad();
+        } else {
+          window.addEventListener('load', onPageLoad);
+          // Remove the event listener when component unmounts
+          return () => window.removeEventListener('load', onPageLoad);
         }
-    }, [])
+      }, []);
 
     function fetchTokenURI(tokenID, done) {
         GetTokenURI(parseInt(tokenID)).then(async CID => {
@@ -26,7 +45,6 @@ export const MarketPlacePage = () => {
                 tokensArray.push(json)
                 if(done){
                     setNFTImageData([...NFTImageData, ...tokensArray])
-                    tokensArray=[]
                 }
                 
             })

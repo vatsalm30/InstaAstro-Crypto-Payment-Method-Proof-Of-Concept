@@ -1,7 +1,6 @@
 import {useState} from 'react'
 import {NFTStorage} from 'nft.storage'
-import {mintNFT} from './Web3Client'
-import "../App.css";
+import {mintNFT, getTokenCounter} from './Web3Client'
 
 export const NFTMint = () => {
 
@@ -10,9 +9,9 @@ export const NFTMint = () => {
     const [nftDescr, setNFTDescr] = useState("Thing")
 
     const NFT_STORAGE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweEYyODM3YUM2MjJDYTk1NTBEQzBmODM0MWE5OGZGNkIzQUYwMWM3ODMiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTY3NTAwOTUzNTI0MywibmFtZSI6IlZhbWF6b24gSXBmcyBlbmNvZGluZyJ9.ry07HwNtVi4ciXthBL9HZgcr1kLaRy7PesrRfLeS0BI"
-    async function storeNFT(_image, _name, _description) {
+    async function storeNFT(_image, _name, _description, _tokenId) {
         // load the file from disk
-        //const image = await fileFromPath(imagePath)
+        // const image = await fileFromPath(imagePath)
     
         // create a new NFTStorage client using our API key
         const nftstorage = new NFTStorage({ token: NFT_STORAGE_KEY })
@@ -23,6 +22,7 @@ export const NFTMint = () => {
           name: _name,
           image: _image,
           description: _description,
+          tokenId: _tokenId
         }).then(nftIPFS => {
             MintNFT(nftIPFS.url)
             console.log(nftIPFS.url)
@@ -39,8 +39,11 @@ export const NFTMint = () => {
 
     async function handelSubmit(e){
         e.preventDefault()
-        const result = await storeNFT(nftImage, nftName, nftDescr, resolve => setTimeout(resolve, 3000))
-        console.log(result)
+        getTokenCounter().then(async (tokenId)=>{
+          const result = await storeNFT(nftImage, nftName, nftDescr, Number(tokenId+window.BigInt(1)))
+          console.log(result)
+        })
+
     }
 
     function dataURItoBlob(dataURI) {
