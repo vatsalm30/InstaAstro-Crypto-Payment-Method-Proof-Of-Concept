@@ -1,9 +1,12 @@
 import Web3 from "web3";
 import NFTContract from "contracts/NFT.json"
+import MarketContract from "contracts/Market.json"
 
 
 let selectedAccount;
+let NFTADDRESS;
 let NFT;
+let Market;
 export const init = async () => {
     let provider = window.ethereum;
 
@@ -27,7 +30,9 @@ export const init = async () => {
     const web3 = new Web3(provider);
 
     const networkId = await web3.eth.net.getId();
-    NFT = new web3.eth.Contract(NFTContract.abi, NFTContract.networks[networkId].address)
+    NFTADDRESS = NFTContract.networks[networkId].address
+    NFT = new web3.eth.Contract(NFTContract.abi, NFTADDRESS)
+    Market = new web3.eth.Contract(MarketContract.abi, MarketContract.networks[networkId].address)
 };
 
 export const mintNFT = (tokenURI) => {
@@ -43,3 +48,11 @@ export const getTokenCounter = () => {
 export const getNFTMinter = (tokenID) => {
     return NFT.methods.ownerOf(tokenID).call();
   }
+
+export const listToken = (tokenID, price, stock, searchTerms) => {
+    return Market.methods.listToken(NFTADDRESS, tokenID, price, stock, searchTerms).send({ from: selectedAccount });
+}
+
+export const buyToken = (tokenID) => {
+  return Market.methods.buyToken(tokenID).send({ from: selectedAccount });
+}

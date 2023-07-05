@@ -10,7 +10,7 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
 contract NFT is ERC721, ERC721Enumerable, ERC721URIStorage, Pausable, Ownable, ERC721Burnable{
-	constructor() ERC721("Coolest NFT", "NFT") {}
+	constructor() ERC721("Pyramint", "PYM") {}
 
 	//Counters.Counter private _tokenIdCounter;
     uint public tokenIdCounter;
