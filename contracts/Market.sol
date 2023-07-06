@@ -1,125 +1,63 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "contracts/SaleTokens.sol";
+import "contracts/Interfaces/IMarket.sol";
+import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Receiver.sol";
 
-contract Market {
-	enum ListingStatus {
-		Active,
-		OutOfStock,
-		Cancelled
-	}
-
-	struct Listing {
-		ListingStatus status;
-		address seller;
-		address token;
-		uint tokenId;
-		uint stock;
-		uint price;
-		string[] searchTerms;
-	}
-
-	event Listed(
-		uint listingId,
-		address seller,
-		address token,
-		uint tokenId,
-		uint stock,
-		uint price,
-		string[] searchTerms
-	);
-
-	event Sale(
-		uint listingId,
-		address buyer,
-		address token,
-		uint tokenId,
-		uint stock,
-		uint price
-	);
-
-	event Cancel(
-		uint listingId,
-		address seller
-	);
-
-	uint private _listingId = 0;
-	mapping(uint => Listing) private _listings;
-
-	function listToken(address token, uint tokenId, uint price, uint stock, string[] calldata searchTerms) public {
-        IERC721(token).approve(address(this), tokenId);
-        IERC721(token).transferFrom(msg.sender, address(this), tokenId);
+contract Market is IMarket, ERC1155Receiver{
     
-		Listing memory listing = Listing(
-			ListingStatus.Active,
-			msg.sender,
-			token,
-			tokenId,
-			stock,
-			price,
-			searchTerms
-		);
+    enum ListingStatus {
+        Active,
+        SoldOut,
+        Canceled
+    }
 
-		_listingId++;
+    struct Listing{
+        uint256 tokenId;
+        uint256 stock;
+        uint256 price;
+        address seller;
+        address token;
+        string[] searchItems;
+    }
 
-		_listings[_listingId] = listing;
 
-		emit Listed(
-			_listingId,
-			msg.sender,
-			token,
-			tokenId,
-			stock,
-			price,
-			searchTerms
-		);
-	}
+    uint256 listingId = 0;
+    mapping(uint256 => Listing) private listings;
 
-	function getListing(uint listingId) public view returns (Listing memory) {
-		return _listings[listingId];
-	}
+    function listProduct(uint256 tokenId, uint256 listAmount, uint256 listPrice, address token, string[] memory listingSearchItems) override public {
+        require(msg.sender == SaleTokens(token).getMinter(tokenId), "Token can only be listed by minter as you cannot buy and relist token");
+        require(listAmount <= SaleTokens(token).balanceOf(msg.sender, tokenId), "You do not have enough tokens");
 
-	function buyToken(uint listingId) public payable {
-		Listing storage listing = _listings[listingId];
+        SaleTokens(token).transferFrom(msg.sender, address(this), tokenId, listAmount);
 
-		require(msg.sender != listing.seller, "Seller cannot be buyer");
-		require(listing.status == ListingStatus.Active, "Listing is not active");
+        listingId++;
+        listings[listingId] = Listing(
+            tokenId,
+            listAmount,
+            listPrice,
+            msg.sender,
+            token,
+            listingSearchItems
+        );
+        emit Listed(
+            tokenId, 
+            listingId, 
+            listAmount, 
+            listPrice, 
+            msg.sender, 
+            token, 
+            listingSearchItems
+        );
+    }
 
-		require(msg.value >= listing.price, "Insufficient payment");
+    function onERC1155Received(address operator, address from, uint256 id, uint256 value, bytes calldata data) external pure override returns (bytes4){
+        return 0xf23a6e61;
+    }
 
-		listing.stock--;
+    function onERC1155BatchReceived(address operator, address from, uint256[] calldata ids, uint256[] calldata values, bytes calldata data) external pure override returns (bytes4){
+        return 0xbc197c81;
+    }
 
-		if (listing.stock == 0){
-			listing.status = ListingStatus.OutOfStock;
-		}
-
-		
-
-		IERC721(listing.token).transferFrom(address(this), msg.sender, listing.tokenId);
-		payable(listing.seller).transfer(listing.price);
-
-		emit Sale(
-			listingId,
-			msg.sender,
-			listing.token,
-			listing.tokenId,
-			listing.stock,
-			listing.price
-		);
-	}
-
-	function cancel(uint listingId) public {
-		Listing storage listing = _listings[listingId];
-
-		require(msg.sender == listing.seller, "Only seller can cancel listing");
-		require(listing.status == ListingStatus.Active, "Listing is not active");
-
-		listing.status = ListingStatus.Cancelled;
-	
-		IERC721(listing.token).transferFrom(address(this), msg.sender, listing.tokenId);
-
-		emit Cancel(listingId, listing.seller);
-	}
 }

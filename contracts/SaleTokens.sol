@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "contracts/Interfaces/ISaleTokens.sol";
 
 contract SaleTokens is ERC1155, ISaleTokens {
-    constructor(string memory _uri) ERC1155(_uri) {}
+    constructor() ERC1155("doesn't matter") {}
 
     struct Token{
         string _tokenURI;
