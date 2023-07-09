@@ -41,7 +41,7 @@ export const mintItems = (itemNum, tokenURI) => {
     return SaleToken.methods.mintItems(itemNum, tokenURI).send({ from: selectedAccount });
 }
 export const approve = () => {
-  return SaleToken.methods.mintItems(MarketAddress, true).send({ from: selectedAccount });
+  return SaleToken.methods.setApprovalForAll(MarketAddress, true).send({ from: selectedAccount });
 }
 export const getTokenURI = (tokenID) => {
   return SaleToken.methods.uri(tokenID).call();
@@ -54,7 +54,7 @@ export const getItemMinter = (tokenID) => {
 }
 
 export const listToken = (tokenID, price, stock, searchTerms) => {
-    return Market.methods.listToken(SaleTokenAddress, tokenID, price, stock, searchTerms).send({ from: selectedAccount });
+    return Market.methods.listProduct(tokenID, stock, price, SaleTokenAddress, searchTerms).send({ from: selectedAccount });
 }
 
 export const buyToken = (tokenID) => {

@@ -128,7 +128,11 @@ export const ProductPage = () => {
     navigate("/market");
   }
 
-
+  function  handelSubmit(e){
+    e.preventDefault()
+    approve()
+    listToken(id, price, stock, inputs)
+  }
   
   return (
     <div>
@@ -145,7 +149,7 @@ export const ProductPage = () => {
       />
       <br></br><br></br>
       {isMinter ?(        
-        <form onSubmit={console.log()}>
+        <form onSubmit={handelSubmit}>
           <label>List Product: </label>
           <br></br>
           <label>Price: </label>
