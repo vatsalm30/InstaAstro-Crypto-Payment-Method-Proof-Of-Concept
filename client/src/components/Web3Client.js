@@ -1,12 +1,13 @@
 import Web3 from "web3";
-import NFTContract from "contracts/NFT.json"
+import SaleTokenContract from "contracts/SaleTokens.json"
 import MarketContract from "contracts/Market.json"
 
 
 let selectedAccount;
-let NFTADDRESS;
-let NFT;
+let SaleTokenAddress;
+let SaleToken;
 let Market;
+let MarketAddress;
 export const init = async () => {
     let provider = window.ethereum;
 
@@ -30,27 +31,30 @@ export const init = async () => {
     const web3 = new Web3(provider);
 
     const networkId = await web3.eth.net.getId();
-    NFTADDRESS = NFTContract.networks[networkId].address
-    NFT = new web3.eth.Contract(NFTContract.abi, NFTADDRESS)
-    Market = new web3.eth.Contract(MarketContract.abi, MarketContract.networks[networkId].address)
+    SaleTokenAddress = SaleTokenContract.networks[networkId].address
+    MarketAddress = MarketContract.networks[networkId].address
+    SaleToken = new web3.eth.Contract(SaleTokenContract.abi, SaleTokenAddress)
+    Market = new web3.eth.Contract(MarketContract.abi, MarketAddress)
 };
 
-export const mintNFT = (tokenURI) => {
-    return NFT.methods.safeMint(tokenURI).send({ from: selectedAccount });
+export const mintItems = (itemNum, tokenURI) => {
+    return SaleToken.methods.mintItems(itemNum, tokenURI).send({ from: selectedAccount });
+}
+export const approve = () => {
+  return SaleToken.methods.mintItems(MarketAddress, true).send({ from: selectedAccount });
 }
 export const getTokenURI = (tokenID) => {
-  return NFT.methods.tokenURI(tokenID).call();
+  return SaleToken.methods.uri(tokenID).call();
+}
+export const getTokenCounter = () => {
+    return SaleToken.methods.getLastTokenId().call();
+}
+export const getItemMinter = (tokenID) => {
+    return SaleToken.methods.getMinter(tokenID).call();
 }
 
-export const getTokenCounter = () => {
-    return NFT.methods.lastTokenId().call();
-  }
-export const getNFTMinter = (tokenID) => {
-    return NFT.methods.ownerOf(tokenID).call();
-  }
-
 export const listToken = (tokenID, price, stock, searchTerms) => {
-    return Market.methods.listToken(NFTADDRESS, tokenID, price, stock, searchTerms).send({ from: selectedAccount });
+    return Market.methods.listToken(SaleTokenAddress, tokenID, price, stock, searchTerms).send({ from: selectedAccount });
 }
 
 export const buyToken = (tokenID) => {

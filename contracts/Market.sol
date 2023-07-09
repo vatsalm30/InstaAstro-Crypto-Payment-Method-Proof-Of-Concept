@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-import "contracts/SaleTokens.sol";
-import "contracts/Interfaces/IMarket.sol";
+import "./SaleTokens.sol";
+import "./Interfaces/IMarket.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Receiver.sol";
 
 contract Market is IMarket, ERC1155Receiver{

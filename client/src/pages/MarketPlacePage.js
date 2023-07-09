@@ -1,5 +1,5 @@
 import {useState, useEffect} from 'react';
-import {getTokenURI, getTokenCounter, init} from '../components/Web3Client';
+import {getTokenURI, getTokenCounter} from '../components/Web3Client';
 import TitlebarImageList from '../components/ImagePanel';
 import { useNavigate } from "react-router-dom";
 

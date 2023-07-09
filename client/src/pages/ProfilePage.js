@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate } from "react-router-dom";
 import Web3 from "web3";
 import TitlebarImageList from '../components/ImagePanel';
-import {getTokenURI, getTokenCounter, getNFTMinter} from '../components/Web3Client';
+import {getTokenURI, getTokenCounter, getItemMinter} from '../components/Web3Client';
 
 const ProfilePage = () => {
 
@@ -88,7 +88,7 @@ const ProfilePage = () => {
         for(let i = 1; i<= tokenID; i++){
             GetNFTMinter(i).then(async (Owner)=>{
                 if (window.BigInt(Account) == window.BigInt(Owner))            
-                    fetchTokenURI(i, i == tokenID && NFTImageData.length == 0);
+                    fetchTokenURI(i, NFTImageData.length == 0);
             }
             )
 
@@ -99,7 +99,7 @@ const ProfilePage = () => {
         return getTokenURI(tokenID)
     }    
     const GetNFTMinter = (tokenID) => {
-        return getNFTMinter(tokenID)
+        return getItemMinter(tokenID)
     }
 
     const ListingRedirect = () => {

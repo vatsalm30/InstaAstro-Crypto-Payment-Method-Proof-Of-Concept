@@ -12,6 +12,16 @@ interface ISaleTokens {
     function mintItems(uint256 numItems, string memory metadataURI) external;
 
     /**
+    @dev This function is used to transfer a specified number of items to an account from specified account
+    Params:
+    - from: the sending account
+    - to: the reciving account
+    - id: the tokenId
+    - amount: the amount of tokens that are to be transfered
+    **/
+    function transferFrom(address from, address to, uint256 id, uint256 amount) external;
+
+    /**
     @dev Returns the number of different tokens that have been minted
     **/
     function getLastTokenId() external view returns (uint256);

@@ -1,6 +1,6 @@
 import {useState} from 'react'
 import {NFTStorage} from 'nft.storage'
-import {mintNFT, getTokenCounter, listToken} from './Web3Client'
+import {mintItems, getTokenCounter, listToken} from './Web3Client'
 
 export const NFTMint = () => {
 
@@ -32,7 +32,7 @@ export const NFTMint = () => {
     }
 
     const MintNFT = (nftURL) => {
-        mintNFT(nftURL).then(tx => {
+        mintItems(10, nftURL).then(tx => {
           console.log(tx)
         }).catch(err => {console.log(err)})
       }

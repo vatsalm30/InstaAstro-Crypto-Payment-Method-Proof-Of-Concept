@@ -12,6 +12,7 @@ import ProfilePage from "./pages/ProfilePage"
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ProductPage } from "./pages/ProductPage";
 
+
 /*
 pyramint.io
 pyrmint.com

@@ -2,7 +2,7 @@
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
-import "contracts/Interfaces/ISaleTokens.sol";
+import "./Interfaces/ISaleTokens.sol";
 
 contract SaleTokens is ERC1155, ISaleTokens {
     constructor() ERC1155("doesn't matter") {}
@@ -49,7 +49,14 @@ contract SaleTokens is ERC1155, ISaleTokens {
 
         return keccak256(b1) == keccak256(b2);
     }
-
+    
+    function transferFrom(address from, address to, uint256 id, uint256 amount) public override virtual {
+        require(
+            from == _msgSender() || isApprovedForAll(from, _msgSender()),
+            "ERC1155: caller is not token owner or approved"
+        );
+        _safeTransferFrom(from, to, id, amount, "");
+    }
 
     function uri(uint256 tokenNum) public view override returns (string memory){
         return _tokens[tokenNum]._tokenURI;
