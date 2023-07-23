@@ -36,11 +36,7 @@ export const NFTMint = () => {
           console.log(tx)
         }).catch(err => {console.log(err)})
       }
-    const listNFT = (tokenID, price, stock, searchTerms) =>{
-      listToken(tokenID, price, stock, searchTerms).then(tx => {
-        console.log(tx)
-      }).catch(err => {console.log(err)})
-    }
+
     async function handelSubmit(e){
         e.preventDefault()
         getTokenCounter().then(async (tokenId)=>{
@@ -48,12 +44,6 @@ export const NFTMint = () => {
           console.log(mintresult)
     })
 
-    }
-    async function handel(e){
-      e.preventDefault()
-      getTokenCounter().then(async (tokenId) => {
-        await listNFT(tokenId, 10, 10, ["thing", "idk"])
-      })
     }
 
     function dataURItoBlob(dataURI) {
@@ -97,9 +87,6 @@ export const NFTMint = () => {
         <input type="text" onChange={onGetDescr} className='cta-text'/>
         <br></br>
         <input type='Submit' value="Mint" className = "cta-button"/>
-        </form>
-        <form onSubmit={handel}>
-          <input type='submit' value='list' className='cta-button'/>
         </form>
     </div>
     )

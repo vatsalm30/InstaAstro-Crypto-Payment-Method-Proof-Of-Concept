@@ -40,8 +40,8 @@ export const init = async () => {
 export const mintItems = (itemNum, tokenURI) => {
     return SaleToken.methods.mintItems(itemNum, tokenURI).send({ from: selectedAccount });
 }
-export const approve = () => {
-  return SaleToken.methods.setApprovalForAll(MarketAddress, true).send({ from: selectedAccount });
+export const approve = (doAllow) => {
+  return SaleToken.methods.setApprovalForAll(MarketAddress, doAllow).send({ from: selectedAccount });
 }
 export const getTokenURI = (tokenID) => {
   return SaleToken.methods.uri(tokenID).call();

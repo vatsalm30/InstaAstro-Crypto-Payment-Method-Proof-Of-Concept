@@ -130,8 +130,10 @@ export const ProductPage = () => {
 
   function  handelSubmit(e){
     e.preventDefault()
-    approve()
-    listToken(id, price, stock, inputs)
+    approve(true).catch(err => console.log(err))
+    listToken(id, price, stock, inputs).catch(err => console.log(err))
+    approve(false).catch(err => console.log(err))
+
   }
   
   return (
