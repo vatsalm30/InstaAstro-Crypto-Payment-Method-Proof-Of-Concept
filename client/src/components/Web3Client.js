@@ -53,6 +53,15 @@ export const getItemMinter = (tokenID) => {
     return SaleToken.methods.getMinter(tokenID).call();
 }
 
+export const listingNum = () =>{
+  return Market.methods.getNumOfListings().call();
+}
+
+export const getListingTokenURI = (_listingId) =>{
+  return Market.methods.getListingTokenURI(_listingId).call();
+}
+
+
 export const listToken = (tokenID, price, stock, searchTerms) => {
     return Market.methods.listProduct(tokenID, stock, price, SaleTokenAddress, searchTerms).send({ from: selectedAccount });
 }

@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-
 interface ISaleTokens {
     /**
     @dev This function is used to mint a specified number of items with the given metadata URI
@@ -19,7 +18,12 @@ interface ISaleTokens {
     - id: the tokenId
     - amount: the amount of tokens that are to be transfered
     **/
-    function transferFrom(address from, address to, uint256 id, uint256 amount) external;
+    function transferFrom(
+        address from,
+        address to,
+        uint256 id,
+        uint256 amount
+    ) external;
 
     /**
     @dev Returns the number of different tokens that have been minted
@@ -42,5 +46,3 @@ interface ISaleTokens {
 
     function getMinter(uint256 _tokenId) external returns (address);
 }
-
-

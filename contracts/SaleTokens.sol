@@ -7,7 +7,7 @@ import "./Interfaces/ISaleTokens.sol";
 contract SaleTokens is ERC1155, ISaleTokens {
     constructor() ERC1155("doesn't matter") {}
 
-    struct Token{
+    struct Token {
         string _tokenURI;
         address _tokenMinter;
     }
@@ -17,31 +17,40 @@ contract SaleTokens is ERC1155, ISaleTokens {
     function setTokenURI(uint256 _tokenId, string memory _uri) private {
         _tokens[_tokenId]._tokenURI = _uri;
     }
-    function mintItems(uint256 numItems, string memory metadataURI) public override  {
+
+    function mintItems(uint256 numItems, string memory metadataURI)
+        public
+        override
+    {
         bool isNew = true;
         uint256 currentTokenId = 0;
-        for (uint256 i = 1; i <= tokenId; i++){
-            if(stringsEquals(_tokens[i]._tokenURI, metadataURI)){
+        for (uint256 i = 1; i <= tokenId; i++) {
+            if (stringsEquals(_tokens[i]._tokenURI, metadataURI)) {
                 isNew = false;
                 currentTokenId = i;
                 break;
             }
         }
         bytes memory byteMetadata = bytes(metadataURI);
-        if(isNew || _tokens[currentTokenId]._tokenMinter != msg.sender){
+        if (isNew || _tokens[currentTokenId]._tokenMinter != msg.sender) {
             tokenId++;
             currentTokenId = tokenId;
             setTokenURI(currentTokenId, metadataURI);
             _tokens[currentTokenId]._tokenMinter = msg.sender;
             _mint(msg.sender, currentTokenId, numItems, byteMetadata);
-        }
-        else if(!isNew && _tokens[currentTokenId]._tokenMinter == msg.sender){
+        } else if (
+            !isNew && _tokens[currentTokenId]._tokenMinter == msg.sender
+        ) {
             setTokenURI(currentTokenId, metadataURI);
             _mint(msg.sender, currentTokenId, numItems, byteMetadata);
         }
     }
 
-    function stringsEquals(string memory s1, string memory s2) private pure returns (bool) {
+    function stringsEquals(string memory s1, string memory s2)
+        private
+        pure
+        returns (bool)
+    {
         bytes memory b1 = bytes(s1);
         bytes memory b2 = bytes(s2);
         uint256 l1 = b1.length;
@@ -49,8 +58,13 @@ contract SaleTokens is ERC1155, ISaleTokens {
 
         return keccak256(b1) == keccak256(b2);
     }
-    
-    function transferFrom(address from, address to, uint256 id, uint256 amount) public override virtual {
+
+    function transferFrom(
+        address from,
+        address to,
+        uint256 id,
+        uint256 amount
+    ) public virtual override {
         require(
             from == _msgSender() || isApprovedForAll(from, _msgSender()),
             "ERC1155: caller is not token owner or approved"
@@ -58,23 +72,24 @@ contract SaleTokens is ERC1155, ISaleTokens {
         _safeTransferFrom(from, to, id, amount, "");
     }
 
-    function uri(uint256 tokenNum) public view override returns (string memory){
+    function uri(uint256 tokenNum)
+        public
+        view
+        override
+        returns (string memory)
+    {
         return _tokens[tokenNum]._tokenURI;
     }
 
-
-    function getLastTokenId() public view override returns (uint256){
+    function getLastTokenId() public view override returns (uint256) {
         return tokenId;
     }
 
-    function burn(uint256 _tokenId, uint256 amount) public override{
+    function burn(uint256 _tokenId, uint256 amount) public override {
         _burn(msg.sender, _tokenId, amount);
     }
 
-    function getMinter(uint256 _tokenId) public view returns (address){
+    function getMinter(uint256 _tokenId) public view returns (address) {
         return _tokens[_tokenId]._tokenMinter;
     }
-
 }
-
-

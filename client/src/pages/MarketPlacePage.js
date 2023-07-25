@@ -1,5 +1,5 @@
 import {useState, useEffect} from 'react';
-import {getTokenURI, getTokenCounter} from '../components/Web3Client';
+import {getListingTokenURI, listingNum} from '../components/Web3Client';
 import TitlebarImageList from '../components/ImagePanel';
 import { useNavigate } from "react-router-dom";
 
@@ -12,7 +12,7 @@ export const MarketPlacePage = () => {
     useEffect(()=>{
         if(loadSite){
             try{
-            getTokenCounter().then((tokenID) =>{
+            listingNum().then((tokenID) =>{
                 loopOverTokens(tokenID)
                 if(NFTImageData.length !== 0 && NFTImageData.length < tokenID) navigate("/market")
             }).catch((error) => console.log(error))
@@ -39,7 +39,7 @@ export const MarketPlacePage = () => {
       }, []);
 
     function fetchTokenURI(tokenID, done) {
-        GetTokenURI(parseInt(tokenID)).then(async CID => {
+        getListingTokenURI(parseInt(tokenID)).then(async CID => {
             await fetch(CID.replace("ipfs://", "https://").replace("/metadata.json", ".ipfs.dweb.link/metadata.json")).then(async res => {
                 const json = await res.json()
                 tokensArray.push(json)
@@ -57,10 +57,6 @@ export const MarketPlacePage = () => {
         for(let i = 1; i<= tokenID; i++){
             await fetchTokenURI(i, i==tokenID && NFTImageData.length == 0);
         }
-    }
-
-    const GetTokenURI = (tokenID) => {
-        return getTokenURI(tokenID)
     }
 
     const ListingRedirect = () => {

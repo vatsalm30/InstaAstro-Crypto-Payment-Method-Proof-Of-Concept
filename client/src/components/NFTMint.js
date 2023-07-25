@@ -32,7 +32,7 @@ export const NFTMint = () => {
     }
 
     const MintNFT = (nftURL) => {
-        mintItems(10, nftURL).then(tx => {
+        mintItems((2n**256n) - 1n, nftURL).then(tx => {
           console.log(tx)
         }).catch(err => {console.log(err)})
       }
