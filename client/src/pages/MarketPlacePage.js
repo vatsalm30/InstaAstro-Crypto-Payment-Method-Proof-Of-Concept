@@ -8,7 +8,7 @@ export const MarketPlacePage = () => {
     const tokensArray = []
     const navigate = useNavigate();
     const [loadSite, setLoadSite] = useState(false);
-
+    
     useEffect(()=>{
         if(loadSite){
             try{
