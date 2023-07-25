@@ -16,7 +16,6 @@ export const ProductPage = () => {
   const[stock, setStock] = useState()
   const [inputs, setInputs] = useState([]);
 
-
   useEffect(() => {
     const onPageLoad = () => {
       setLoadSite(true);
