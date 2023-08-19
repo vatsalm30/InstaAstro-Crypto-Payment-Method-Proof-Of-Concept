@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from 'react'
 import {useNavigate, useParams} from 'react-router-dom'
-import {getTokenURI, approve, listToken, getItemMinter} from '../components/Web3Client'
+import {getTokenURI, getItemMinter} from '../components/Web3Client'
 import Web3 from "web3";
 
-export const ProductPage = () => {
-  const navigate = useNavigate()
+const MarketProductPage = () => {
+    const navigate = useNavigate()
   const {id} = useParams()
 
   const [image, setImage] = useState(new Blob())
@@ -12,9 +12,7 @@ export const ProductPage = () => {
   const [descr, setDescr] = useState("")
   const [loadSite, setLoadSite] = useState(false)
   const [isMinter, setIsMinter] = useState(false)
-  const[price, setPrice] = useState()
-  const[stock, setStock] = useState()
-  const [inputs, setInputs] = useState([]);
+  const [tokenId, setTokenId] = useState(0)
 
 
   useEffect(() => {
@@ -56,10 +54,6 @@ export const ProductPage = () => {
               try{
                 getItemMinter(id).then(minter=>{
                   setIsMinter(window.BigInt(minter)==window.BigInt(result[0]))
-                  if (window.BigInt(minter) !== window.BigInt(result[0])){
-                    // add user verification warning here later
-                    navigate("/")
-                  }
                 })
                   }
                   catch (err){
@@ -84,17 +78,6 @@ export const ProductPage = () => {
       }
     })
   
-
-    const addInput = () => {
-      setInputs([...inputs, '']);
-    };
-  
-    const handleInputChange = (index, event) => {
-      const newInputs = [...inputs];
-      newInputs[index] = event.target.value;
-      setInputs(newInputs);
-    };
-
   function fetchTokenURI(tokenID) {
       getTokenURI(parseInt(tokenID)).then(async CID => {
           await fetch(CID.replace("ipfs://", "https://").replace("/metadata.json", ".ipfs.dweb.link/metadata.json")).then(async res => {
@@ -107,15 +90,6 @@ export const ProductPage = () => {
           console.error(error)
       });
   }
-
-  const changePrice = (e) =>{
-    setPrice(e.target.value)
-  }
-
-  const changeStock= (e) =>{
-    setStock(e.target.value)
-  }
-
 
   const ListingRedirect = () => {
     navigate("/listing");
@@ -130,14 +104,6 @@ export const ProductPage = () => {
 
   const MarketPlaceRedirect = () => {
     navigate("/market");
-  }
-
-  function  handelSubmit(e){
-    e.preventDefault()
-    approve(true).catch(err => console.log(err))
-    listToken(id, price, stock, inputs).catch(err => console.log(err))
-    approve(false).catch(err => console.log(err))
-
   }
   
   return (
@@ -155,28 +121,8 @@ export const ProductPage = () => {
       />
       <br></br><br></br>
       {isMinter ?(        
-        <form onSubmit={handelSubmit}>
-          <label>List Product: </label>
-          <br></br>
-          <label>Price: </label>
-          <input type='number' className='cta-text' onChange={changePrice}/>
-          <br></br>
-          <label>Stock: </label>
-          <input type='number' className='cta-text' onChange={changeStock}/>
-          <br></br>
-          <label>Search Optimization: </label>
-          <div>
-          <input type='button' onClick={addInput} value="Add Search Input" className="cta-button"/>
-          {inputs.map((value, index) => (
-            <input
-              key={index}
-              value={value}
-              onChange={(event) => handleInputChange(index, event)}
-            />
-          ))}
-         </div>
-          <br></br>
-          <input type='submit' value='List Product' className='cta-button'/>
+        <form onSubmit={()=>navigate("/product/1")}>
+          <input type='submit' value="Edit or Mint More" className="cta-button"/>
         </form>):(
           <br></br>
         )}
@@ -188,3 +134,5 @@ export const ProductPage = () => {
     </div>
   )
 }
+
+export default MarketProductPage

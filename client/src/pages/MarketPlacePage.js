@@ -75,7 +75,7 @@ export const MarketPlacePage = () => {
         <button onClick={()=>HomeRedirect()} className="cta-button">Home</button>
         <button onClick={()=>ListingRedirect()} className="cta-button">ListingPage</button>
         <button onClick={() => ProfilePageRedirect()} className="cta-button">Profile</button>
-        <TitlebarImageList images={NFTImageData}/>
+        <TitlebarImageList images={NFTImageData} onIMGClick="/market/product/"/>
     </div>
   )
 }

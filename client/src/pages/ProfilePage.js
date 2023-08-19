@@ -121,7 +121,7 @@ const ProfilePage = () => {
         <button onClick={()=>HomeRedirect()} className="cta-button">Home</button>
         <button onClick={()=>ListingRedirect()} className="cta-button">ListingPage</button>
         <button onClick={() => MarketPlaceRedirect()} className="cta-button">Market Place</button>
-        <TitlebarImageList images={NFTImageData}/>
+        <TitlebarImageList images={NFTImageData} onIMGClick="/product/"/>
     </div>
   )
 }

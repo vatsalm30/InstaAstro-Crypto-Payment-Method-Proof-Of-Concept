@@ -6,8 +6,13 @@ import IconButton from '@mui/material/IconButton';
 import InfoIcon from '@mui/icons-material/Info';
 import { useNavigate } from 'react-router-dom';
 
-export default function TitlebarImageList({images}) {
+export default function TitlebarImageList({images, onIMGClick}) {
   const navigate = useNavigate()
+
+  const onClickIMG = (tokenId) => {
+    navigate(onIMGClick + tokenId)
+  }
+
   return (
     <ImageList sx={{ width: 500, height: 450 }}>
       <ImageListItem key="Subheader" cols={2}>
@@ -19,7 +24,7 @@ export default function TitlebarImageList({images}) {
             srcSet={`${item.image.replace("ipfs://", "https://").replace("/blob", ".ipfs.dweb.link/blob")}?w=248&fit=crop&auto=format&dpr=2 2x`}
             alt={item.name}
             loading="lazy"
-            onClick={()=>navigate("/product/" + item.tokenId)}
+            onClick={()=>onClickIMG(item.tokenId)}
             className='cta-image'
             draggable="false"
           />
