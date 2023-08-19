@@ -14,6 +14,7 @@ contract Market is IMarket, ERC1155Receiver {
 
     struct Listing {
         uint256 tokenId;
+        ListingStatus status;
         uint256 stock;
         uint256 price;
         address seller;
@@ -50,6 +51,7 @@ contract Market is IMarket, ERC1155Receiver {
         listingId++;
         listings[listingId] = Listing(
             tokenId,
+            ListingStatus.Active,
             listAmount,
             listPrice,
             msg.sender,
@@ -64,6 +66,46 @@ contract Market is IMarket, ERC1155Receiver {
             msg.sender,
             token,
             listingSearchItems
+        );
+    }
+
+    function buyProduct(uint256 _listingId, uint256 amountToBuy)
+        public
+        payable
+    {
+        require(
+            msg.sender != listings[_listingId].seller,
+            "Seller cannot buy their own token"
+        );
+
+        require(listings[_listingId].status == ListingStatus.Active, "Listing Must be active");
+
+        require(listingId >= _listingId, "Listing doesn't exist");
+
+        require(msg.value>=listings[_listingId].price*amountToBuy, "Must pay more thanlisting price");
+
+        listings[_listingId].stock -= amountToBuy;
+
+        if(listings[_listingId].stock == 0){
+            listings[_listingId].status = ListingStatus.SoldOut;
+        }
+
+        SaleTokens(listings[_listingId].token).transferFrom(
+            address(this),
+            msg.sender,
+            listings[listingId].tokenId,
+            amountToBuy
+        );
+
+        payable(listings[_listingId].seller).transfer(listings[_listingId].price*amountToBuy);
+
+        emit Sale(
+            listingId,
+            amountToBuy,
+            listings[_listingId].price,
+            listings[_listingId].seller,
+            msg.sender,
+            listings[_listingId].token
         );
     }
 
@@ -90,8 +132,20 @@ contract Market is IMarket, ERC1155Receiver {
     function getNumOfListings() public view override returns (uint256) {
         return listingId;
     }
+    
+    function getTokenPrice(uint256 _listingId) public view override returns (uint256) {
+        return listings[_listingId].price;
+    }
 
-    function getListingTokenURI(uint256 _listingId) public view override returns (string memory) {
-        return SaleTokens(listings[_listingId].token).uri(listings[_listingId].tokenId);
+    function getListingTokenURI(uint256 _listingId)
+        public
+        view
+        override
+        returns (string memory)
+    {
+        return
+            SaleTokens(listings[_listingId].token).uri(
+                listings[_listingId].tokenId
+            );
     }
 }

@@ -12,6 +12,15 @@ interface IMarket {
         string[] searchTerms
     );
 
+    event Sale(
+        uint256 listingId,
+        uint256 amountBought,
+        uint256 priceBought,
+        address lister,
+        address buyer,
+        address token
+    );
+
     function listProduct(
         uint256 tokenId,
         uint256 listAmount,
@@ -20,7 +29,16 @@ interface IMarket {
         string[] memory listingSearchItems
     ) external;
 
+    function buyProduct(uint256 _listingId, uint256 amountToBuy)
+        external
+        payable;
+
     function getNumOfListings() external view returns (uint256);
-    
-    function getListingTokenURI(uint256 _listingId) external view returns (string memory);
+
+    function getTokenPrice(uint256 _listingId) external returns (uint256);
+
+    function getListingTokenURI(uint256 _listingId)
+        external
+        view
+        returns (string memory);
 }
