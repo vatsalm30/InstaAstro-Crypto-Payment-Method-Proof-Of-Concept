@@ -63,7 +63,7 @@ const ProfilePage = () => {
       useEffect(()=>{
         if(typeof window.ethereum != "undefined"){
             window.ethereum.on('accountsChanged', function(){
-                navigate("/")
+                // navigate("/")
                 navigate("/profile")
               })
         }

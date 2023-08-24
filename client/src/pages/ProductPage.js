@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react'
-import {useNavigate, useParams} from 'react-router-dom'
-import {getTokenURI, approve, listToken, getItemMinter} from '../components/Web3Client'
+import {Navigate, useNavigate, useParams} from 'react-router-dom'
+import {getTokenURI, approve, listToken, getItemMinter, listingNum, getListingTokenId} from '../components/Web3Client'
 import Web3 from "web3";
 
 export const ProductPage = () => {
@@ -12,10 +12,10 @@ export const ProductPage = () => {
   const [descr, setDescr] = useState("")
   const [loadSite, setLoadSite] = useState(false)
   const [isMinter, setIsMinter] = useState(false)
-  const[price, setPrice] = useState()
-  const[stock, setStock] = useState()
-  const [inputs, setInputs] = useState([]);
-
+  const[price, setPrice] = useState(window.BigInt(0))
+  const[stock, setStock] = useState(0)
+  const [inputs, setInputs] = useState([])
+  const [deployedListing, setDeployedListing] = useState(0)
 
   useEffect(() => {
     const onPageLoad = () => {
@@ -32,21 +32,40 @@ export const ProductPage = () => {
     }
   }, []);
 
-  useEffect(()=>{
-    if(loadSite){
-      try{
-        fetchTokenURI(id)
+  // useEffect(()=>{
+  //   if(loadSite){
+  //     try{
+  //       fetchTokenURI(id)
 
-      }
-      catch (err){
-          navigate("/product/"+id)
-      }
-    }
+  //     }
+  //     catch (err){
+  //         navigate("/product/"+id)
+  //     }
+  //   }
 
-    })
+  //   })
 
 
     useEffect(() => {
+      if(loadSite){
+        try{
+          fetchTokenURI(id)
+          listingNum().then(numOfListings => {
+            for(let i = 1; i <= numOfListings; i++){
+              getListingTokenId(i).then(listingToken =>{
+                if(listingToken == id) {
+                  setDeployedListing(i)
+                }
+              })
+            }
+          })
+        setLoadSite(false)
+        }
+        catch (err){
+            navigate("/product/"+id)
+        }
+      }
+
       if (typeof window.ethereum !== 'undefined') {
         // Request the user's accounts from MetaMask
         const web3 = new Web3(window.ethereum);
@@ -70,19 +89,27 @@ export const ProductPage = () => {
           .catch((error) => {
             console.error('Error retrieving accounts:', error);
           });
+
+          if(typeof window.ethereum != "undefined"){
+            window.ethereum.on('accountsChanged', function(){
+                navigate("/")
+                navigate("/product/"+id)
+              })
+        }
+          
       } else {
         console.error('MetaMask is not installed');
       }
     });
 
-    useEffect(()=>{
-      if(typeof window.ethereum != "undefined"){
-          window.ethereum.on('accountsChanged', function(){
-              navigate("/")
-              navigate("/product/"+id)
-            })
-      }
-    })
+    // useEffect(()=>{
+    //   if(typeof window.ethereum != "undefined"){
+    //       window.ethereum.on('accountsChanged', function(){
+    //           navigate("/")
+    //           navigate("/product/"+id)
+    //         })
+    //   }
+    // })
   
 
     const addInput = () => {
@@ -132,12 +159,19 @@ export const ProductPage = () => {
     navigate("/market");
   }
 
+  const ListedRedirect = () => {
+    navigate("/market/product/"+deployedListing);
+  }
+
   function  handelSubmit(e){
     e.preventDefault()
-    approve(true).catch(err => console.log(err))
-    listToken(id, price, stock, inputs).catch(err => console.log(err))
-    approve(false).catch(err => console.log(err))
-
+    approve(true).then(() => {
+      listToken(id, window.BigInt(price * 1e18), stock, inputs).catch(err => console.log(err))
+      approve(false).then(()=>{
+        navigate("/product/" + id)
+      }).catch(err => console.log(err))
+    }).catch(err => console.log(err))
+    
   }
   
   return (
@@ -153,13 +187,20 @@ export const ProductPage = () => {
             draggable="false"
             style={{height:"40%", width:"40%"}}
       />
-      <br></br><br></br>
+      {(deployedListing != 0) ?(
+        <div>
+      <h1></h1>
+      <button className="cta-button" onClick={()=>ListedRedirect()}>View Deployed Listing</button>
+      </div>):(
+      <div></div>
+      )
+    }
       {isMinter ?(        
         <form onSubmit={handelSubmit}>
           <label>List Product: </label>
           <br></br>
-          <label>Price: </label>
-          <input type='number' className='cta-text' onChange={changePrice}/>
+          <label>Price (In Ethereum): </label>
+          <input type='text' className='cta-text' onChange={changePrice}/>
           <br></br>
           <label>Stock: </label>
           <input type='number' className='cta-text' onChange={changeStock}/>
@@ -172,6 +213,7 @@ export const ProductPage = () => {
               key={index}
               value={value}
               onChange={(event) => handleInputChange(index, event)}
+              className='cta-text'
             />
           ))}
          </div>

@@ -10,18 +10,17 @@ export const MarketPlacePage = () => {
     const [loadSite, setLoadSite] = useState(false);
     
     useEffect(()=>{
-        if(loadSite){
+        if (loadSite){
             try{
             listingNum().then((tokenID) =>{
                 loopOverTokens(tokenID)
-                if(NFTImageData.length !== 0 && NFTImageData.length < tokenID) navigate("/market")
+                if (NFTImageData.length !== 0 && NFTImageData.length < tokenID) navigate("/market")
             }).catch((error) => console.log(error))
             }
             catch (err){
                 navigate("/market")
             }
         }
-
     })
     useEffect(() => {
         const onPageLoad = () => {
@@ -42,6 +41,7 @@ export const MarketPlacePage = () => {
         getListingTokenURI(parseInt(tokenID)).then(async CID => {
             await fetch(CID.replace("ipfs://", "https://").replace("/metadata.json", ".ipfs.dweb.link/metadata.json")).then(async res => {
                 const json = await res.json()
+                json["tokenId"] = tokenID
                 tokensArray.push(json)
                 if(done){
                     setNFTImageData([...NFTImageData, ...tokensArray])

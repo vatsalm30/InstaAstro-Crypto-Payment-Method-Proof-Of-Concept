@@ -57,12 +57,20 @@ export const listingNum = () =>{
   return Market.methods.getNumOfListings().call();
 }
 
-export const listingPrice = () =>{
-  return Market.methods.getNumOfListings().call();
+export const listingPrice = (_listingId) =>{
+  return Market.methods.getTokenPrice(_listingId).call();
 }
 
 export const getListingTokenURI = (_listingId) =>{
   return Market.methods.getListingTokenURI(_listingId).call();
+}
+
+export const getListingTokenId = (_listingId) =>{
+  return Market.methods.getTokenId(_listingId).call();
+}
+
+export const getListingTokenSeller = (_listingId) =>{
+  return Market.methods.getTokenSeller(_listingId).call();
 }
 
 export const listToken = (tokenID, price, stock, searchTerms) => {
@@ -70,5 +78,5 @@ export const listToken = (tokenID, price, stock, searchTerms) => {
 }
 
 export const buyToken = (listingID, amountToBuy, amountToPay) => {
-  return Market.methods.buyToken(listingID, amountToBuy).send({ from: selectedAccount, value: amountToPay });
+  return Market.methods.buyProduct(listingID, amountToBuy).send({ from: selectedAccount, value: amountToPay });
 }

@@ -1,8 +1,11 @@
 import {useState} from 'react'
 import {NFTStorage} from 'nft.storage'
-import {mintItems, getTokenCounter, listToken} from './Web3Client'
+import {mintItems, getTokenCounter} from './Web3Client'
+import { useNavigate } from 'react-router-dom'
 
 export const NFTMint = () => {
+
+    const navigate = useNavigate()
 
     const [nftImage, setNFTImage] = useState(new Blob())
     const [nftName, setNFTName] = useState("Shark")
@@ -34,6 +37,9 @@ export const NFTMint = () => {
     const MintNFT = (nftURL) => {
         mintItems((2n**256n) - 1n, nftURL).then(tx => {
           console.log(tx)
+          getTokenCounter().then(tokenId => {
+            navigate("/product/"+tokenId)
+          })
         }).catch(err => {console.log(err)})
       }
 

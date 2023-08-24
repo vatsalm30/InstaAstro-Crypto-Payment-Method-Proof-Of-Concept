@@ -2,6 +2,12 @@
 pragma solidity ^0.8.9;
 
 interface IMarket {
+    enum ListingStatus {
+        Active,
+        SoldOut,
+        Canceled
+    }
+
     event Listed(
         uint256 tokenId,
         uint256 listingId,
@@ -36,6 +42,14 @@ interface IMarket {
     function getNumOfListings() external view returns (uint256);
 
     function getTokenPrice(uint256 _listingId) external returns (uint256);
+
+    function getTokenId(uint256 _listingId) external returns (uint256);
+
+    function getTokenStock(uint256 _listingId) external returns (uint256);
+
+    function getTokenStatus(uint256 _listingId) external returns (ListingStatus);
+
+    function getTokenSeller(uint256 _listingId) external returns (address);
 
     function getListingTokenURI(uint256 _listingId)
         external

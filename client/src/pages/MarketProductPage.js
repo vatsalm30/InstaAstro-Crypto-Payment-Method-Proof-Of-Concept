@@ -1,7 +1,8 @@
 import React, {useEffect, useState} from 'react'
 import {useNavigate, useParams} from 'react-router-dom'
-import {getTokenURI, getItemMinter} from '../components/Web3Client'
+import {getListingTokenURI, getListingTokenSeller, getListingTokenId, buyToken, listingPrice} from '../components/Web3Client'
 import Web3 from "web3";
+import Decimal from 'decimal.js';
 
 const MarketProductPage = () => {
     const navigate = useNavigate()
@@ -13,6 +14,9 @@ const MarketProductPage = () => {
   const [loadSite, setLoadSite] = useState(false)
   const [isMinter, setIsMinter] = useState(false)
   const [tokenId, setTokenId] = useState(0)
+  const [tokenStock, setTokenStock] = useState("")
+  const [tokenPrice, setTokenPrice] = useState("")
+  const [amountToBuy, setAmountToBuy] = useState(0)
 
 
   useEffect(() => {
@@ -30,21 +34,39 @@ const MarketProductPage = () => {
     }
   }, []);
 
-  useEffect(()=>{
-    if(loadSite){
-      try{
-        fetchTokenURI(id)
-
-      }
-      catch (err){
-          navigate("/product/"+id)
-      }
-    }
-
-    })
+//   useEffect(()=>{
+//     if(loadSite){
+//       try{
+//         fetchTokenURI(id)
+//         setTokenId(getListingTokenId(id))
+//       }
+//       catch (err){
+//           navigate("/market/product/"+id)
+//       }
+//     }
+//     })
 
 
     useEffect(() => {
+    if(loadSite){
+        try{
+            fetchTokenURI(id)
+            getListingTokenId(id).then((tkId) => {
+                setTokenId(tkId)
+            })
+            listingPrice(id).then((price)=>{
+              const priceNum = new Decimal(price.toString())
+              const divisorNum = new Decimal(1e18)
+              setTokenPrice((priceNum.dividedBy(divisorNum)).toString())
+              console.log((priceNum.dividedBy(divisorNum)).toString())
+            })
+            setLoadSite(false)
+        }
+        catch (err){
+            navigate("/market/product/"+id)
+        }
+        }
+    
       if (typeof window.ethereum !== 'undefined') {
         // Request the user's accounts from MetaMask
         const web3 = new Web3(window.ethereum);
@@ -52,34 +74,40 @@ const MarketProductPage = () => {
           .then(async (result) => {
             if(loadSite){
               try{
-                getItemMinter(id).then(minter=>{
+                getListingTokenSeller(id).then(minter=>{
                   setIsMinter(window.BigInt(minter)==window.BigInt(result[0]))
                 })
                   }
                   catch (err){
-                      navigate("/product/"+id)
+                      navigate("/market/product/"+id)
                   }
             }
           })
           .catch((error) => {
             console.error('Error retrieving accounts:', error);
           });
+
+          window.ethereum.on('accountsChanged', function(){
+            navigate("/")
+            navigate("/market/product/"+id)
+          })
+
       } else {
         console.error('MetaMask is not installed');
       }
     });
 
-    useEffect(()=>{
-      if(typeof window.ethereum != "undefined"){
-          window.ethereum.on('accountsChanged', function(){
-              navigate("/")
-              navigate("/product/"+id)
-            })
-      }
-    })
+    // useEffect(()=>{
+    //   if(typeof window.ethereum != "undefined"){
+    //       window.ethereum.on('accountsChanged', function(){
+    //           navigate("/")
+    //           navigate("/product/"+id)
+    //         })
+    //   }
+    // })
   
   function fetchTokenURI(tokenID) {
-      getTokenURI(parseInt(tokenID)).then(async CID => {
+        getListingTokenURI(parseInt(tokenID)).then(async CID => {
           await fetch(CID.replace("ipfs://", "https://").replace("/metadata.json", ".ipfs.dweb.link/metadata.json")).then(async res => {
               const json = await res.json()
               setImage(json["image"].replace("ipfs://", "https://").replace("/blob", ".ipfs.dweb.link/blob"))
@@ -106,9 +134,25 @@ const MarketProductPage = () => {
     navigate("/market");
   }
   
+  const changeAmountToBuy = (e) => {
+    setAmountToBuy(e.target.value)
+  }
+
+  const handelSubmit = (e) => {
+    e.preventDefault()
+    listingPrice(id).then((price) => {
+      console.log(amountToBuy)
+      buyToken(id, amountToBuy, price * window.BigInt(amountToBuy)).catch(error => {
+        console.log(error)
+      })
+    })
+  }
+
   return (
     <div>
       <h1>{name}</h1>
+      <h2>Price: {tokenPrice} ETH</h2>
+      <h2>Stock: {tokenStock}</h2>
       <h4>{descr}</h4>
       <img
             src={`${image}?w=248&fit=crop&auto=format`}
@@ -121,10 +165,15 @@ const MarketProductPage = () => {
       />
       <br></br><br></br>
       {isMinter ?(        
-        <form onSubmit={()=>navigate("/product/1")}>
+        <form onSubmit={()=>navigate("/product/"+tokenId)}>
           <input type='submit' value="Edit or Mint More" className="cta-button"/>
         </form>):(
-          <br></br>
+            <form onSubmit={handelSubmit}>
+              <label>Amount To Buy: </label>
+              <input type="number" className="cta-text" onChange={changeAmountToBuy}/>
+              <br></br>
+              <input type='submit' value="Buy Now" className="cta-button"/>
+            </form>
         )}
       <br></br>
       <button onClick={()=>HomeRedirect()} className="cta-button">Home</button>

@@ -6,12 +6,6 @@ import "./Interfaces/IMarket.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Receiver.sol";
 
 contract Market is IMarket, ERC1155Receiver {
-    enum ListingStatus {
-        Active,
-        SoldOut,
-        Canceled
-    }
-
     struct Listing {
         uint256 tokenId;
         ListingStatus status;
@@ -41,6 +35,46 @@ contract Market is IMarket, ERC1155Receiver {
             "You do not have enough tokens"
         );
 
+        bool newListing = true;
+        uint relistId;
+
+        for (uint256 i = 0; i < listingId; i++){
+            if(listings[i].tokenId == tokenId){
+                relistId = i;
+                newListing = false;
+            }
+        }
+
+        if(!newListing){
+        SaleTokens(token).transferFrom(
+            msg.sender,
+            address(this),
+            tokenId,
+            listAmount
+        );
+
+        listingId++;
+        listings[relistId] = Listing(
+            tokenId,
+            ListingStatus.Active,
+            listAmount,
+            listPrice,
+            msg.sender,
+            token,
+            listingSearchItems
+        );
+        emit Listed(
+            tokenId,
+            relistId,
+            listAmount,
+            listPrice,
+            msg.sender,
+            token,
+            listingSearchItems
+        );
+        }
+
+        else if(newListing) {
         SaleTokens(token).transferFrom(
             msg.sender,
             address(this),
@@ -67,10 +101,12 @@ contract Market is IMarket, ERC1155Receiver {
             token,
             listingSearchItems
         );
+        }
     }
 
     function buyProduct(uint256 _listingId, uint256 amountToBuy)
         public
+        override
         payable
     {
         require(
@@ -135,6 +171,22 @@ contract Market is IMarket, ERC1155Receiver {
     
     function getTokenPrice(uint256 _listingId) public view override returns (uint256) {
         return listings[_listingId].price;
+    }
+
+    function getTokenId(uint256 _listingId) public view override returns (uint256) {
+        return listings[_listingId].tokenId;
+    }
+
+    function getTokenStock(uint256 _listingId) public view override returns (uint256) {
+        return listings[_listingId].stock;
+    }
+
+    function getTokenStatus(uint256 _listingId) public view override returns (ListingStatus) {
+        return listings[_listingId].status;
+    }
+
+    function getTokenSeller(uint256 _listingId) public view override returns (address) {
+        return listings[_listingId].seller;
     }
 
     function getListingTokenURI(uint256 _listingId)
