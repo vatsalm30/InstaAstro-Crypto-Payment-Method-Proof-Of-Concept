@@ -72,6 +72,14 @@ contract SaleTokens is ERC1155, ISaleTokens {
         _safeTransferFrom(from, to, id, amount, "");
     }
 
+    function editToken(uint256 _tokenId, string calldata newURI) public override {
+        require(_tokenId <= tokenId && _tokenId > 0, "Invalid token, or token does not exist.");
+        require(_tokens[_tokenId]._tokenMinter == msg.sender, "Only token minter can edit token.");
+        require(keccak256(abi.encodePacked(_tokens[_tokenId]._tokenURI)) != keccak256(abi.encodePacked(newURI)), "New URI must be different to oroginal URI");
+
+        _tokens[_tokenId]._tokenURI = newURI;
+    }
+
     function uri(uint256 tokenNum)
         public
         view

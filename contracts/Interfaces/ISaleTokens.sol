@@ -25,6 +25,8 @@ interface ISaleTokens {
         uint256 amount
     ) external;
 
+    function editToken(uint256 _tokenId, string memory newURI) external;
+
     /**
     @dev Returns the number of different tokens that have been minted
     **/

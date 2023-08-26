@@ -53,6 +53,10 @@ export const getItemMinter = (tokenID) => {
     return SaleToken.methods.getMinter(tokenID).call();
 }
 
+export const editProductToken = (tokenID, newURI) => {
+  return SaleToken.methods.editToken(tokenID, newURI).send({ from: selectedAccount });
+}
+
 export const listingNum = () =>{
   return Market.methods.getNumOfListings().call();
 }
